@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.5.1)
 project(king)
+set(ENV{PKG_CONFIG_PATH} "/usr/local/Cellar/libusb/1.0.26/lib/pkgconfig")
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(libusb REQUIRED libusb-1.0)
 set(CMAKE_CXX_STANDARD 14)
 
 # libusb-1.0 on windows
@@ -25,5 +28,7 @@ if(DEFINED WIN32)
     find_library(LIBUSB10 NAMES libusb-1.0.lib PATHS ${LIBUSB10_PATH}/lib)
     target_link_libraries(king ${LIBUSB10} Ws2_32.lib)
 else()
-    target_link_libraries(king usb-1.0)
+    target_link_libraries(king ${libusb_LINK_LIBRARIES})
+    target_include_directories(king PUBLIC ${libusb_INCLUDE_DIRS})
+    target_compile_options(king PUBLIC ${libusb_CFLAGS_OTHER})
 endif()
